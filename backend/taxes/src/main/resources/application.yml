@@ -1,0 +1,26 @@
+# กำหนด Port ของ Web Server
+server:
+  port: 8080
+
+# กำหนด Database Configuration (MySQL)
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/taxes?useUnicode=yes&characterEncoding=UTF-8&characterSetResults=UTF-8&useSSL=false&serverTimezone=Asia/Bangkok&allowPublicKeyRetrieval=true
+    username: root
+    password: password  # <--- อย่าลืมเปลี่ยนเป็นรหัสผ่านจริงของ MySQL เครื่องคุณ
+    driver-class-name: com.mysql.cj.jdbc.Driver
+ 
+  # ตั้งค่า JPA / Hibernate
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+# กำหนด Swagger / OpenAPI
+springdoc:
+  swagger-ui:
+    path: /swagger
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs

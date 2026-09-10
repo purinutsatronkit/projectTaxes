@@ -1,0 +1,52 @@
+CREATE TABLE `header` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_by` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `summary_date` date NOT NULL,
+  `summary_no` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `total_fee` decimal(15,2) DEFAULT NULL,
+  `total_purchase` decimal(15,2) DEFAULT NULL,
+  `total_refund` decimal(15,2) DEFAULT NULL,
+  `total_vat` decimal(15,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_keyoilcs76ilf5x3ginlqp4aw` (`summary_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+
+
+CREATE TABLE `detail` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `header_id` int NOT NULL,
+  `book_no` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `doc_no` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `doc_date` date NOT NULL,
+  `tax_id` varchar(13) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `branch_no` varchar(5) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `company_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `purchase_amount` decimal(15,2) NOT NULL,
+  `vat_amount` decimal(15,2) DEFAULT '0.00',
+  `refund_revenue` decimal(15,2) DEFAULT '0.00',
+  `refund_agent` decimal(15,2) DEFAULT '0.00',
+  `fee_amount` decimal(15,2) DEFAULT '0.00',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_by` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_detail_header` (`header_id`),
+  CONSTRAINT `fk_detail_header` FOREIGN KEY (`header_id`) REFERENCES `header` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+
+
+CREATE TABLE `rdbvrtrate` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `SALEFROM` decimal(15,2) NOT NULL COMMENT 'ยอดซื้อเริ่มต้น',
+  `SALETO` decimal(15,2) NOT NULL COMMENT 'ยอดซื้อสิ้นสุด',
+  `VRTRATE` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'ภาษีที่ได้รับคืนจากตัวแทน (อัตรา 1)',
+  `VRTRATEAG` decimal(15,2) NOT NULL DEFAULT '0.00' COMMENT 'ภาษีคืนที่ตัวแทนคืนให้',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_by` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_sale_range` (`SALEFROM`, `SALETO`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -1,0 +1,10 @@
+com\pccth\taxes\TaxesApplication.class
+com\pccth\taxes\controller\TaxesController.class
+com\pccth\taxes\entity\TaxesRdbvrtrateEntity.class
+com\pccth\taxes\repository\TaxesDetailRepository.class
+com\pccth\taxes\service\TaxesService.class
+com\pccth\taxes\service\TaxesServiceImpl.class
+com\pccth\taxes\repository\TaxesRdbvrtrateRepository.class
+com\pccth\taxes\entity\TaxesHeaderEntity.class
+com\pccth\taxes\repository\TaxesHeaderRepository.class
+com\pccth\taxes\entity\TaxesDetailEntity.class
