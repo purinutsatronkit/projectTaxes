@@ -1,0 +1,289 @@
+<div class="container">
+  <div class="app-header">
+    <h2>ข้อมูลแบบ ภ.พ.10</h2>
+
+    <!-- ส่วนค้นหาคู่: เลขที่ใบสรุป + วันที่จัดทำ -->
+    <div class="summary-badge">
+      <span class="badge-label">เลขที่ใบสรุป:</span>
+      <input
+        type="text"
+        [(ngModel)]="searchSummaryNo"
+        (keyup.enter)="searchFromDB()"
+        placeholder="เช่น turkXXXXXX"
+        style="width: 130px"
+      />
+
+      <span class="badge-label" style="margin-left: 6px">วันที่:</span>
+      <!-- 📌 จุดที่ 1: ใส่ lang="th-TH" ที่ช่องค้นหาวันที่ -->
+      <input type="date" [(ngModel)]="searchSummaryDate" lang="th-TH" />
+
+      <!-- ปุ่มค้นหาแบบใหม่ -->
+      <button type="button" (click)="searchFromDB()" class="btn-search">ค้นหา</button>
+
+      <!-- ปุ่มเริ่มใหม่แบบใหม่ -->
+      <button type="button" (click)="clearForm()" class="btn-reset">เริ่มใหม่</button>
+    </div>
+  </div>
+
+  <!-- ฟอร์มกรอกรายการย่อย แยกซ้าย-ขวา -->
+  <fieldset class="form-section">
+    <legend>ภ.พ.10</legend>
+
+    <div class="form-layout">
+      <!-- ฝั่งซ้าย: ข้อมูลสำหรับกรอก (6 ช่อง) -->
+      <div class="form-group-left">
+        <div class="input-item">
+          <label>เล่มที่ <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="detailForm.bookNo" placeholder="กรอกเล่มที่" />
+        </div>
+        <div class="input-item">
+          <label>เลขที่ <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="detailForm.docNo" placeholder="กรอกเลขที่" />
+        </div>
+        <div class="input-item">
+          <label>วันที่จัดทำ ภ.พ.10 <span class="req">*</span></label>
+          <!-- 📌 จุดที่ 2: ใส่ lang="th-TH" ที่ช่องวันที่จัดทำ -->
+          <input type="date" [(ngModel)]="detailForm.docDate" lang="th-TH" />
+        </div>
+        <div class="input-item">
+          <label>เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)</label>
+          <input
+            type="text"
+            [(ngModel)]="detailForm.taxId"
+            appTaxIdMask
+            maxlength="13"
+            placeholder="ระบุตัวเลข 13 หลัก"
+          />
+        </div>
+        <div class="input-item">
+          <label>สาขา</label>
+          <input type="text" [(ngModel)]="detailForm.branchNo" maxlength="5" placeholder="00000" />
+        </div>
+        <div class="input-item span-full">
+          <label>ชื่อสถานประกอบการ</label>
+          <input
+            type="text"
+            [(ngModel)]="detailForm.companyName"
+            placeholder="ระบุชื่อบริษัท/ร้านค้า"
+          />
+        </div>
+      </div>
+
+      <!-- ฝั่งขวา: คำนวณอัตโนมัติระบบภาษี (4 ช่อง) -->
+      <div class="form-group-right">
+        <!-- 1. ยอดซื้อ -->
+        <div class="calc-card primary-calc">
+          <label>ยอดซื้อ <span class="text-danger">*</span></label>
+          <input
+            type="number"
+            class="input-num"
+            [(ngModel)]="detailForm.purchaseAmount"
+            (ngModelChange)="onPurchaseAmountChange()"
+            placeholder="0.00"
+          />
+        </div>
+
+        <!-- 2. VAT 7% -->
+        <div class="calc-card">
+          <div class="label-box">
+            <span>ภาษีที่ได้รับคืน(กรมสรรพากร)</span>
+            <small class="tag">VAT 7%</small>
+          </div>
+          <input
+            type="text"
+            class="input-num"
+            [ngModel]="detailForm.vatAmount | number: '1.2-2'"
+            readonly
+            placeholder="0.00"
+          />
+        </div>
+
+        <!-- 3. ภาษีที่ได้รับคืนจากตัวแทน (อัตรา 1) -->
+        <div class="calc-card">
+          <div class="label-box">
+            <span>ภาษีที่ได้รับคืนจากตัวแทน</span>
+            <small class="tag">อัตรา 1</small>
+          </div>
+          <input
+            type="text"
+            class="input-num"
+            [ngModel]="detailForm.refundRevenue | number: '1.2-2'"
+            readonly
+            placeholder="0.00"
+          />
+        </div>
+
+        <!-- 4. ภาษีคืนที่ตัวแทนคืนให้ -->
+        <div class="calc-card">
+          <div class="label-box">
+            <span>ภาษีคืนที่ตัวแทนคืนให้</span>
+          </div>
+          <input
+            type="text"
+            class="input-num"
+            [ngModel]="detailForm.refundAgent | number: '1.2-2'"
+            readonly
+            placeholder="0.00"
+          />
+        </div>
+
+        <!-- 5. ค่าธรรมเนียมในการคืน (อัตรา 2) -->
+        <div class="calc-card">
+          <div class="label-box">
+            <span>ค่าธรรมเนียมในการคืน</span>
+            <small class="tag">อัตรา 2</small>
+          </div>
+          <input
+            type="text"
+            class="input-num"
+            [ngModel]="detailForm.feeAmount | number: '1.2-2'"
+            readonly
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        *ngIf="editingIndex >= 0"
+        (click)="cancelEdit()"
+      >
+        ยกเลิกแก้ไข
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [ngClass]="editingIndex >= 0 ? 'btn-warning' : 'btn-primary'"
+        (click)="addOrUpdateDetail()"
+      >
+        {{ editingIndex >= 0 ? 'อัปเดตรายการ' : 'เพิ่มรายการลงตาราง' }}
+      </button>
+    </div>
+  </fieldset>
+
+  <!-- ตารางแสดงรายการ -->
+  <div class="table-section">
+    <h3>รายการใบกำกับภาษีที่บันทึก {{ currentSummaryNo ? '(' + currentSummaryNo + ')' : '' }}</h3>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th style="width: 50px">ลำดับ</th>
+          <th style="width: 90px">เล่มที่</th>
+          <th style="width: 100px">เลขที่</th>
+          <th style="width: 100px">วันที่</th>
+          <th>ชื่อสถานประกอบการ</th>
+          <th class="text-right">ยอดซื้อ</th>
+          <th class="text-right">ภาษี (7%)</th>
+          <th class="text-right">เงินคืน</th>
+          <th class="text-right">ค่าธรรมเนียม</th>
+          <th style="width: 130px" class="text-center">จัดการ</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of detailList; let i = index">
+          <td class="text-center">{{ i + 1 }}</td>
+          <td class="text-center">
+            <strong>{{ item.bookNo }}</strong>
+          </td>
+          <td class="text-center">{{ item.docNo }}</td>
+          <td>{{ formatThaiDate(item.docDate) }}</td>
+          <td>{{ item.companyName || '-' }}</td>
+          <td class="text-right num-font">{{ item.purchaseAmount | number: '1.2-2' }}</td>
+          <td class="text-right num-font">{{ item.vatAmount | number: '1.2-2' }}</td>
+          <td class="text-right num-font">{{ item.refundRevenue | number: '1.2-2' }}</td>
+          <td class="text-right num-font">{{ item.feeAmount | number: '1.2-2' }}</td>
+          <td class="text-center">
+            <button class="btn-action edit" (click)="editDetail(i)" title="แก้ไข">แก้ไข</button>
+            <button class="btn-action delete" (click)="removeDetail(i)" title="ลบ">ลบ</button>
+          </td>
+        </tr>
+        <tr *ngIf="detailList.length === 0">
+          <td colspan="10" class="empty-state">
+            ไม่พบรายการย่อย กรุณาระบุเงื่อนไขค้นหา หรือกรอกข้อมูลใหม่
+          </td>
+        </tr>
+        </tbody>
+        <tfoot *ngIf="detailList.length > 0">
+        <tr class="summary-row">
+          <td colspan="5" class="text-right"><strong>รวมทั้งสิ้น:</strong></td>
+          <td class="text-right num-font">
+            <strong>{{ totalPurchase | number: '1.2-2' }}</strong>
+          </td>
+          <td class="text-right num-font">
+            <strong>{{ totalVat | number: '1.2-2' }}</strong>
+          </td>
+          <td class="text-right num-font">
+            <strong>{{ totalRefund | number: '1.2-2' }}</strong>
+          </td>
+          <td class="text-right num-font">
+            <strong>{{ totalFee | number: '1.2-2' }}</strong>
+          </td>
+          <td></td>
+        </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- ปุ่มแอ็กชันหลัก -->
+  <div class="action-buttons">
+    <button type="button" (click)="clearForm()" class="btn btn-outline">ล้างหน้าจอ</button>
+    <button type="button" (click)="printReport()" class="btn btn-info" *ngIf="currentSummaryNo">
+      พิมพ์ใบสรุป (PDF)
+    </button>
+    <button type="button" (click)="saveAll()" class="btn btn-save">บันทึกใบสรุป ภ.พ.10</button>
+  </div>
+</div>
+
+<!-- Modal ป๊อปอัปเลือกเลขที่ใบสรุป -->
+<div class="modal-backdrop" *ngIf="showSelectSummaryModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>เลือกใบสรุป ภ.พ.10 (ประจำวันที่ {{ formatThaiDate(searchSummaryDate) }})</h3>
+      <button type="button" class="btn-close" (click)="showSelectSummaryModal = false">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 12px; color: #64748b; font-size: 13.5px">
+        พบใบสรุปทั้งหมด {{ matchedSummaryList.length }} รายการ กรุณาเลือกรายการที่ต้องการจัดการ:
+      </p>
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th>เลขที่ใบสรุป</th>
+          <th>วันที่จัดทำ</th>
+          <th class="text-right">ยอดซื้อรวม</th>
+          <th class="text-center" style="width: 90px">เลือก</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of matchedSummaryList">
+          <td>
+            <strong>{{ item.summaryNo }}</strong>
+          </td>
+          <td>{{ formatThaiDate(item.summaryDate) }}</td>
+          <td class="text-right num-font">{{ item.totalPurchase | number: '1.2-2' }}</td>
+          <td class="text-center">
+            <button
+              type="button"
+              (click)="confirmSelectSummary(item)"
+              class="btn btn-primary"
+              style="padding: 4px 10px; font-size: 12px"
+            >
+              เลือกใบนี้
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer" style="margin-top: 15px; text-align: right">
+      <button type="button" class="btn btn-secondary" (click)="showSelectSummaryModal = false">
+        ยกเลิก
+      </button>
+    </div>
+  </div>
+</div>
