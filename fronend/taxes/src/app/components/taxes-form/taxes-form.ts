@@ -102,6 +102,8 @@ export class TaxesFormComponent implements OnInit {
       },
     });
   }
+
+  // AddกับEdit
   // AddกับEdit
   addOrUpdateDetail(): void {
     if (
@@ -114,15 +116,18 @@ export class TaxesFormComponent implements OnInit {
       return;
     }
 
-    if (!this.detailForm.bookNo || !this.detailForm.docNo || !this.detailForm.purchaseAmount) {
+    // 1. ถอดขีดออกให้เหลือเฉพาะตัวเลขล้วน
+    const rawTaxId = (this.detailForm.taxId || '').replace(/\D/g, '');
+    if (rawTaxId && rawTaxId.length < 13) {
+      alert('เลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก');
       return;
     }
 
-    if (this.detailForm.taxId && this.detailForm.taxId.length < 13) {
-      return;
-    }
-
-    const detailItem = { ...this.detailForm };
+    // 2. ⚡ แก้ไขตรงนี้: กำหนดให้ taxId ใน detailItem เก็บเฉพาะตัวเลขล้วน (rawTaxId) ก่อนลงตาราง
+    const detailItem: TaxesDetail = {
+      ...this.detailForm,
+      taxId: rawTaxId
+    };
 
     if (this.editingIndex >= 0) {
       this.detailList[this.editingIndex] = detailItem;
@@ -154,6 +159,10 @@ export class TaxesFormComponent implements OnInit {
   removeDetail(index: number): void {
     const isConfirmed = confirm('คุณต้องการลบรายการนี้ออกจากตารางใช่หรือไม่?');
 
+    if (!isConfirmed) {
+      return;
+    }
+
     this.detailList.splice(index, 1);
     if (this.editingIndex === index) {
       this.cancelEdit();
@@ -173,6 +182,10 @@ export class TaxesFormComponent implements OnInit {
       (sum, item) => sum + (Number(item.refundRevenue) || 0),
       0,
     );
+    this.totalRefundAg = this.detailList.reduce(
+      (sum, item) => sum + (Number(item.refundAgent) || 0),
+      0,
+    );
     this.totalFee = this.detailList.reduce((sum, item) => sum + (Number(item.feeAmount) || 0), 0);
   }
 
@@ -182,10 +195,15 @@ export class TaxesFormComponent implements OnInit {
       alert('กรุณากรอกข้อมูลรายการย่อยอย่างน้อย 1 รายการก่อนบันทึก');
       return;
     }
+    const cleanDetails = this.detailList.map((item) => ({
+      ...item,
+      taxId: (item.taxId || '').replace(/\D/g, '').substring(0, 13),
+    }));
 
     const payload: TaxesHeader = {
       summaryNo: this.currentSummaryNo || undefined,
-      details: this.detailList,
+      summaryDate: this.searchSummaryDate || new Date().toISOString().split('T')[0],
+      details: cleanDetails,
       totalPurchase: this.totalPurchase,
       totalVat: this.totalVat,
       totalRefund: this.totalRefund,
@@ -197,6 +215,7 @@ export class TaxesFormComponent implements OnInit {
         if (res && res.summaryNo) {
           this.currentSummaryNo = res.summaryNo;
           this.searchSummaryNo = res.summaryNo;
+          if (res.summaryDate) this.searchSummaryDate = res.summaryDate;
         }
         alert('บันทึกข้อมูลใบสรุปสำเร็จเรียบร้อยแล้ว!');
         this.cdr.detectChanges();
@@ -215,6 +234,7 @@ export class TaxesFormComponent implements OnInit {
     const summaryDate = this.searchSummaryDate || '';
 
     if (!summaryNo && !summaryDate) {
+      alert('กรุณากรอกเลขที่ใบสรุป หรือ วันที่ เพื่อค้นหา');
       return;
     }
 
@@ -231,13 +251,14 @@ export class TaxesFormComponent implements OnInit {
         } else if (matchedHeaders.length > 1) {
           this.matchedSummaryList = matchedHeaders;
           this.showSelectSummaryModal = true;
+        } else {
+          alert('ไม่พบข้อมูลใบสรุปที่ระบุ');
         }
-        //ตรวจจับUI ใหม่เพราะถ้าเข้าอันนี้ ก็เท่ากับว่าต้องเปิด modal มันจะอัพเดททันที
         this.cdr.detectChanges();
       },
-      //ไว้สำหรับเช็ค error เฉยๆ
       error: (err: any) => {
         console.error('Search error:', err);
+        alert('เกิดข้อผิดพลาดในการค้นหาข้อมูล');
         this.cdr.detectChanges();
       },
     });
@@ -272,6 +293,7 @@ export class TaxesFormComponent implements OnInit {
   // บันทึกPDF
   printReport(): void {
     if (!this.currentSummaryNo) {
+      alert('กรุณาบันทึกหรือเลือกใบสรุปก่อนสั่งพิมพ์ PDF');
       return;
     }
 
@@ -292,6 +314,7 @@ export class TaxesFormComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Print error:', err);
+        alert('เกิดข้อผิดพลาดในการสร้างไฟล์ PDF');
       },
     });
   }

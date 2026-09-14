@@ -72,6 +72,9 @@ public class TaxesServiceImpl implements TaxesService {
             entityToSave = new TaxesHeaderEntity();
             entityToSave.setSummaryNo(generateUniqueSummaryNo());
         }
+        entityToSave.setSummaryDate(headerEntity.getSummaryDate() != null
+                ? headerEntity.getSummaryDate()
+                : java.time.LocalDate.now());
 
         if (entityToSave.getId() != null) {
             if (entityToSave.getDetails() != null) {
@@ -96,7 +99,11 @@ public class TaxesServiceImpl implements TaxesService {
                 detail.setDocNo(detailDto.getDocNo());
                 detail.setDocDate(detailDto.getDocDate());
                 detail.setCompanyName(detailDto.getCompanyName());
-                detail.setTaxId(detailDto.getTaxId());
+                if (detailDto.getTaxId() != null) {
+                    detail.setTaxId(detailDto.getTaxId().replaceAll("\\D", ""));
+                } else {
+                    detail.setTaxId(null);
+                }
                 detail.setBranchNo(detailDto.getBranchNo());
                 detail.setPurchaseAmount(detailDto.getPurchaseAmount());
                 detail.setVatAmount(detailDto.getVatAmount());

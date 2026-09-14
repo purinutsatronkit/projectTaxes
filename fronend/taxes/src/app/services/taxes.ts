@@ -16,12 +16,12 @@ export class TaxesService {
     return this.http.get<TaxRateResponse>(`${this.baseUrl}/calculate?amount=${amount}`);
   }
 
-  // บันทึกข้อมูล Header + Details
+  // บันทึกข้อมูล
   saveTaxes(data: TaxesHeader): Observable<TaxesHeader> {
     return this.http.post<TaxesHeader>(`${this.baseUrl}/save`, data);
   }
 
-  // ดึงข้อมูลใบสรุปทั้งหมด (สำหรับ Modal ค้นหา)
+  // ดึงข้อมูลใบสรุปทั้งหมด
   getAllHeaders(): Observable<TaxesHeader[]> {
     return this.http.get<TaxesHeader[]>(`${this.baseUrl}/headers`);
   }

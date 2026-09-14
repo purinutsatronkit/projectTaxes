@@ -14,23 +14,18 @@
       />
 
       <span class="badge-label" style="margin-left: 6px">วันที่:</span>
-      <!-- 📌 จุดที่ 1: ใส่ lang="th-TH" ที่ช่องค้นหาวันที่ -->
+
       <input type="date" [(ngModel)]="searchSummaryDate" lang="th-TH" />
 
-      <!-- ปุ่มค้นหาแบบใหม่ -->
       <button type="button" (click)="searchFromDB()" class="btn-search">ค้นหา</button>
 
-      <!-- ปุ่มเริ่มใหม่แบบใหม่ -->
       <button type="button" (click)="clearForm()" class="btn-reset">เริ่มใหม่</button>
     </div>
   </div>
-
-  <!-- ฟอร์มกรอกรายการย่อย แยกซ้าย-ขวา -->
   <fieldset class="form-section">
     <legend>ภ.พ.10</legend>
 
     <div class="form-layout">
-      <!-- ฝั่งซ้าย: ข้อมูลสำหรับกรอก (6 ช่อง) -->
       <div class="form-group-left">
         <div class="input-item">
           <label>เล่มที่ <span class="req">*</span></label>
@@ -42,7 +37,6 @@
         </div>
         <div class="input-item">
           <label>วันที่จัดทำ ภ.พ.10 <span class="req">*</span></label>
-          <!-- 📌 จุดที่ 2: ใส่ lang="th-TH" ที่ช่องวันที่จัดทำ -->
           <input type="date" [(ngModel)]="detailForm.docDate" lang="th-TH" />
         </div>
         <div class="input-item">
@@ -51,8 +45,8 @@
             type="text"
             [(ngModel)]="detailForm.taxId"
             appTaxIdMask
-            maxlength="13"
-            placeholder="ระบุตัวเลข 13 หลัก"
+            maxlength="17"
+            placeholder="x-xxxx-xxxxx-xx-x"
           />
         </div>
         <div class="input-item">
@@ -68,22 +62,19 @@
           />
         </div>
       </div>
-
-      <!-- ฝั่งขวา: คำนวณอัตโนมัติระบบภาษี (4 ช่อง) -->
       <div class="form-group-right">
-        <!-- 1. ยอดซื้อ -->
         <div class="calc-card primary-calc">
           <label>ยอดซื้อ <span class="text-danger">*</span></label>
           <input
             type="number"
+            step="0.01"
+            min="0"
             class="input-num"
             [(ngModel)]="detailForm.purchaseAmount"
             (ngModelChange)="onPurchaseAmountChange()"
             placeholder="0.00"
           />
         </div>
-
-        <!-- 2. VAT 7% -->
         <div class="calc-card">
           <div class="label-box">
             <span>ภาษีที่ได้รับคืน(กรมสรรพากร)</span>
@@ -97,8 +88,6 @@
             placeholder="0.00"
           />
         </div>
-
-        <!-- 3. ภาษีที่ได้รับคืนจากตัวแทน (อัตรา 1) -->
         <div class="calc-card">
           <div class="label-box">
             <span>ภาษีที่ได้รับคืนจากตัวแทน</span>
@@ -112,8 +101,6 @@
             placeholder="0.00"
           />
         </div>
-
-        <!-- 4. ภาษีคืนที่ตัวแทนคืนให้ -->
         <div class="calc-card">
           <div class="label-box">
             <span>ภาษีคืนที่ตัวแทนคืนให้</span>
@@ -126,8 +113,6 @@
             placeholder="0.00"
           />
         </div>
-
-        <!-- 5. ค่าธรรมเนียมในการคืน (อัตรา 2) -->
         <div class="calc-card">
           <div class="label-box">
             <span>ค่าธรรมเนียมในการคืน</span>
@@ -143,7 +128,6 @@
         </div>
       </div>
     </div>
-
     <div class="form-actions">
       <button
         type="button"
@@ -164,7 +148,7 @@
     </div>
   </fieldset>
 
-  <!-- ตารางแสดงรายการ -->
+  <!-- ตารางรายการ -->
   <div class="table-section">
     <h3>รายการใบกำกับภาษีที่บันทึก {{ currentSummaryNo ? '(' + currentSummaryNo + ')' : '' }}</h3>
     <div class="table-responsive">
@@ -229,7 +213,6 @@
     </div>
   </div>
 
-  <!-- ปุ่มแอ็กชันหลัก -->
   <div class="action-buttons">
     <button type="button" (click)="clearForm()" class="btn btn-outline">ล้างหน้าจอ</button>
     <button type="button" (click)="printReport()" class="btn btn-info" *ngIf="currentSummaryNo">
@@ -239,7 +222,6 @@
   </div>
 </div>
 
-<!-- Modal ป๊อปอัปเลือกเลขที่ใบสรุป -->
 <div class="modal-backdrop" *ngIf="showSelectSummaryModal">
   <div class="modal-content">
     <div class="modal-header">
