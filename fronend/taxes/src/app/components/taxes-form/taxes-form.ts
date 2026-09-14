@@ -104,7 +104,6 @@ export class TaxesFormComponent implements OnInit {
   }
 
   // AddกับEdit
-  // AddกับEdit
   addOrUpdateDetail(): void {
     if (
       !this.detailForm.bookNo ||

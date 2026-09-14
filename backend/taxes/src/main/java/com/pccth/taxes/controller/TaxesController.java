@@ -25,7 +25,7 @@ public class TaxesController {
     // 1. GET /api/taxes/calculate?amount=1500 -> คำนวณอัตราภาษีจากยอดซื้อ
     @GetMapping("/calculate")
     public ResponseEntity<TaxesRdbvrtrateEntity> calculateTax(@RequestParam BigDecimal amount) {
-        TaxesRdbvrtrateEntity rate = taxesService.calculateTaxRate(amount);
+        TaxesRdbvrtrateEntity rate = taxesService.  calculateTaxRate(amount);
         if (rate != null) {
             return ResponseEntity.ok(rate);
         }
@@ -70,10 +70,10 @@ public class TaxesController {
         try {
             byte[] pdfBytes = taxesService.exportPdfReport(summaryNo);
 
-            // 📌 ตั้งชื่อไฟล์ที่ต้องการ เช่น ภพ10_turk145666.pdf
+
             String fileName = "ภพ10_" + summaryNo + ".pdf";
 
-            // กำหนด Header ให้เปิดแบบ inline ( preview ) พร้อมระบุ filename
+
             ContentDisposition contentDisposition = ContentDisposition.inline()
                     .filename(fileName, StandardCharsets.UTF_8)
                     .build();
@@ -82,7 +82,6 @@ public class TaxesController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(contentDisposition);
             
-            // 📌 สำคัญมาก: ต้อง Expose Header เพื่อให้ Browser ยอมนำชื่อไฟล์ไปใช้ตอน Save
             headers.add("Access-Control-Expose-Headers", "Content-Disposition");
 
             return ResponseEntity.ok()

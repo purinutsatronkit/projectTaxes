@@ -16,7 +16,7 @@ public class TaxesHeaderEntity {
     private Long id;
 
     @Column(name = "summary_no", nullable = false, unique = true, length = 20)
-    private String summaryNo; // เช่น turk849201
+    private String summaryNo;
 
     @Column(name = "summary_date", nullable = false)
     private LocalDate summaryDate;

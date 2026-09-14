@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface TaxesDetailRepository extends JpaRepository<TaxesDetailEntity, Long> {
 
-    // ค้นหารายการย่อย ภ.พ.10 ทั้งหมดตาม ID ของ Header
     List<TaxesDetailEntity> findByHeaderId(Long headerId);
 }
